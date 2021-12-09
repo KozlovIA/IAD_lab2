@@ -28,6 +28,7 @@ def readFile(file = "data.txt"):  # считывание из файла
             except:
                 temp.append(val)
         x.append(temp); xNoStr.append(tempNoStr)
+    file.close()
     return x, xNoStr
 
 def point_1(data):
@@ -36,7 +37,7 @@ def point_1(data):
     sns.heatmap(data.corr(), annot=True)
     plt.show()
 
-def point_1_1(data, label_list, labels):
+def point_1_1(data, label_list, labels=None):
     fig = plt.figure()
     ax = mplot3d.Axes3D(fig)
     ax.scatter(data[label_list[0]], data[label_list[1]], data[label_list[2]], cmap=plt.cm.Set1, edgecolor='k', c=labels)
@@ -50,9 +51,9 @@ def point_1_1(data, label_list, labels):
 def point_2(data):
     methods = ['single', 'complete', 'average']
     plot_dendrogram(data, distance='euclidean', method='centroid', labels=[])
-    plt.title(f'Метод = centroid' + f'\nРасстояние = euclidean')
+    plt.title('Метод = centroid' + '\nРасстояние = euclidean')
     plot_dendrogram(data, distance='euclidean', method='ward', labels=[])
-    plt.title(f'Метод = ward' + f'\nРасстояние = euclidean')
+    plt.title('Метод = ward' + '\nРасстояние = euclidean')
     for method in methods:
         for dist in ['euclidean', 'chebyshev', 'minkowski', 'cosine']:
             plot_dendrogram(data, distance=dist, method=method, labels=[])
@@ -66,17 +67,23 @@ def plot_dendrogram(data, distance, method, labels):
 
 def point_3(data, label_list):
     plt.figure()
-    data_reduced_2 = PCA(n_components=2).fit_transform(data)
+    data_r_2 = PCA(n_components=2, random_state=0)
+    data_reduced_2 = data_r_2.fit_transform(data)
     plt.scatter(data_reduced_2[:, 0], data_reduced_2[:, 1])
     fig = plt.figure()
     ax = Axes3D(fig)
-    data_reduced_3 = PCA(n_components=3).fit_transform(data)
+    data_r_3 = PCA(n_components=3, random_state=0)
+    data_reduced_3 = data_r_3.fit_transform(data)
     ax.scatter(data_reduced_3[:, 0], data_reduced_3[:, 1], data_reduced_3[:, 2], s=40)
     ax.set_title('Visualization')
     ax.set_xlabel(label_list[0])
     ax.set_ylabel(label_list[1])
     ax.set_zlabel(label_list[2])
+    print("Выделенные компоненты", data_r_2.components_, "Главные компоненты", data_r_2.explained_variance_ratio_, sep='\n')
+    print("Выделенные компоненты", data_r_3.components_, "Главные компоненты", data_r_3.explained_variance_ratio_, sep='\n')
     plt.show()
+
+
     
 def point_4(data, label_list):
     plt.figure()
@@ -132,10 +139,10 @@ def main():
     labels = np.array(data['species'])
 
     #рост-возраст-вес-позиция
-    #data = pd.read_excel('baseball.xlsx')
-    #data_NoLabel = data.drop('Position', 1)     #data_NoLabel не содержит столбца с лейблами
-    #label_list = list(data_NoLabel.columns)
-    #labels = np.array(data['Position'])
+    """ data = pd.read_excel('baseball.xlsx')
+    data_NoLabel = data.drop('Position', 1)     #data_NoLabel не содержит столбца с лейблами
+    label_list = list(data_NoLabel.columns)
+    labels = np.array(data['Position']) """
 
     k=0
     for i in range(len(labels)-1):
@@ -145,13 +152,16 @@ def main():
         else:
             labels[i] = k
     labels[-1] = k
-    print(data)
+    #print(data)
     #point_1(data)
-    #point_1_1(data, label_list, labels)
+    #point_1_1(data, label_list)#, labels)
     #point_2(data_NoLabel)
     #point_3(data_NoLabel, label_list)
     #point_4(data_NoLabel, label_list)
-    point_6(data_NoLabel, label_list, labels)
+    #point_6(data_NoLabel, label_list, labels)
+
+    #7 принадлежность к реальному кластеру
+    point_1_1(data, label_list, labels)
 
 
 
