@@ -83,7 +83,7 @@ def point_2(data, target):
 def point_3(data, target):
     X_train, X_test, Y_train, Y_test = train_test_split(data, target, test_size=0.3)
     model = GridSearchCV(KNeighborsClassifier(),
-        {'n_neighbors': list(range(1, 51)), 'weights': ['uniform', 'distance']}, n_jobs=3, cv=5)
+        {'n_neighbors': list(range(2, 6)), 'weights': ['uniform', 'distance']}, n_jobs=3, cv=5)
     print("Обучение модели")
     model.fit(X_train, Y_train)
     print('Best_params')
@@ -101,6 +101,31 @@ def point_3(data, target):
     print(model2.best_params_)
     print('Report')
     print(classification_report(Y_test, model.predict(X_test)))
+
+
+def third_task(data, lbls):
+    x_train, x_test, y_train, y_test = train_test_split(data, lbls, test_size=0.3)
+    model = GridSearchCV(KNeighborsClassifier(),
+                         {'n_neighbors': list(range(2,6)),
+                          'weights': ['uniform', 'distance']},
+                         n_jobs=3, cv=5)
+    print('Обучение модели')
+    model.fit(x_train, y_train)
+    print('Best params')
+    print(model.best_params_)
+    print('Report')
+    print(classification_report(y_test, model.predict(x_test)))
+    model2 = GridSearchCV(LogisticRegression(),
+                        {'solver': ['newton-cg', 'lbfgs', 'liblinear', 'sag', 'saga'],
+                         'penalty': ['l1', 'l2'],
+                         'C': [i / 10 for i in range(1,15)]},
+                         n_jobs=3, cv=5)
+    """ print('Обучение модели')
+    model2.fit(x_train, y_train)
+    print('Best params')
+    print(model2.best_params_)
+    print('Report')
+    print(classification_report(y_test, model.predict(x_test))) """
 
 
 def point_4(data, lbls, n_neighbors, weights, C, penalty, solver):
@@ -131,16 +156,16 @@ def point_4(data, lbls, n_neighbors, weights, C, penalty, solver):
 
 def main():
     #Ирисы
-    """ data = sns.load_dataset('iris')
+    data = sns.load_dataset('iris')
     data_NoLabel = data.drop('species', 1)    #data_NoLabel не содержит столбца с лейблами
     label_list = list(data.columns); label_list.pop(1)
-    classes = np.array(data['species']) """
+    classes = np.array(data['species'])
 
     #рост-возраст-вес-позиция
-    data = pd.read_excel('baseball.xlsx')
+    """ data = pd.read_excel('baseball.xlsx')
     data_NoLabel = data.drop('Position', 1)     #data_NoLabel не содержит столбца с лейблами
     label_list = list(data_NoLabel.columns)
-    classes = np.array(data['Position'])
+    classes = np.array(data['Position']) """
 
     target = np.array([0]*len(classes), np.int32)
 
@@ -153,17 +178,58 @@ def main():
             target[i] = k
     target[-1] = k
 
+
+    """ data = pd.read_excel('baseball.xlsx')
+    data.sort_values(by='Position', inplace=True)
+    data_NoLabel = data.drop(columns='Position')
+    labels = data['Position']
+    lbls = [0]*len(labels)
+    for i in range(0,len(labels)):
+        if labels[i] == 'Baseman':
+            lbls[i] = 0
+        elif labels[i] == 'Catcher':
+            lbls[i] = 1
+        elif labels[i] == 'Outfielder':
+            lbls[i] = 2
+        elif labels[i] == 'Pitcher':
+            lbls[i] = 3
+        elif labels[i] == 'Relief_P':
+            lbls[i] = 4
+    target = np.array(sorted(lbls)) """
     #test_data = load_iris()
     
     #print(data_NoLabel)
     #point_1_PCA(data_NoLabel, label_list, target)
     #point_1_TSNE(data_NoLabel, label_list, target, True)
-    #point_2(data_NoLabel, target)
+    point_2(data_NoLabel, target)
     #point_3(data_NoLabel, target)
-    point_4(data_NoLabel, target, 3, 'distance', 0.2, 'l2', 'saga')
+    #point_4(data=data_NoLabel, lbls=target, n_neighbors=6, weights='uniform', C=0.2, penalty='l2', solver='saga')  #ирис
+    #point_4(data=data_NoLabel, lbls=target, n_neighbors=2, weights='uniform', C=0.1, penalty='l2', solver='newton-cg')  #рост-возраст-вес
+    #rvv()
 
-
-
+def rvv():
+    data2full = pd.read_excel('baseball.xlsx')
+    data2full.sort_values(by='Position', inplace=True)
+    data2 = data2full.drop(columns='Position')
+    labels = data2full['Position']
+    lbls = [0]*len(labels)
+    for i in range(0,len(labels)):
+        if labels[i] == 'Baseman':
+            lbls[i] = 0
+        elif labels[i] == 'Catcher':
+            lbls[i] = 1
+        elif labels[i] == 'Outfielder':
+            lbls[i] = 2
+        elif labels[i] == 'Pitcher':
+            lbls[i] = 3
+        elif labels[i] == 'Relief_P':
+            lbls[i] = 4
+    lbls = np.array(sorted(lbls))
+    # task1(data2, lbls)
+    # task1_without_pca(data2, lbls)
+    # task1_tsne_pca(data2, lbls)
+    #second_task(data2, lbls)
+    third_task(data2, lbls)
 
     
 
